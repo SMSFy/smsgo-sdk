@@ -107,7 +107,7 @@ try {
 | Opção     | Tipo            | Default                      | Descrição                          |
 | --------- | --------------- | ---------------------------- | ---------------------------------- |
 | `apiKey`  | `string`        | —                            | **Obrigatório.** Sua SMSGo-key.    |
-| `baseUrl` | `string`        | `https://app.smsgo.com.br`   | Útil para ambiente local/staging.  |
+| `baseUrl` | `string`        | `https://api.smsgo.com.br`   | Útil para ambiente local/staging.  |
 | `fetch`   | `typeof fetch`  | `globalThis.fetch`           | Injete um fetch (ex.: undici).     |
 
 ### Métodos
