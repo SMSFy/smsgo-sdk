@@ -6,7 +6,7 @@ Guia de release do SDK Node.js. Registry: **npm** · pacote `@orynlabs/smsgo` (e
 
 1. Conta npm com permissão de publish no escopo `@orynlabs` (membro da org/escopo).
 2. **Automation token** (npm → _Access Tokens → Generate New Token → Automation_ — ignora 2FA em CI).
-3. No GitHub do repo (`SMSFy/smsgo-sdk`) → _Settings → Secrets and variables → Actions_ → criar o secret **`NPM_TOKEN`** com esse token.
+3. No GitHub do repo (`SMSFy/smsgo-sdk-nodejs`) → _Settings → Secrets and variables → Actions_ → criar o secret **`NPM_TOKEN`** com esse token.
 
 O workflow [`/.github/workflows/publish.yml`](.github/workflows/publish.yml) já faz o resto: valida o token com `npm whoami`, builda e roda `npm publish --provenance --access public`.
 
