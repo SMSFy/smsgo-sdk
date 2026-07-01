@@ -192,7 +192,7 @@ Em falhas de validação (422), `err.errors` traz o detalhe por campo (`{ field,
 | Opção     | Tipo            | Default                      | Descrição                          |
 | --------- | --------------- | ---------------------------- | ---------------------------------- |
 | `apiKey`  | `string`        | —                            | **Obrigatório.** Sua SMSGo-key.    |
-| `baseUrl` | `string`        | `https://api.smsgo.com.br`   | Útil para ambiente local/staging.  |
+| `baseUrl` | `string`        | `https://api.smsgo.com.br`   | Não precisa mexer; só se a SMSGo orientar. |
 | `fetch`   | `typeof fetch`  | `globalThis.fetch`           | Injete um fetch (ex.: undici).     |
 
 ### Métodos
@@ -223,15 +223,6 @@ Em falhas de validação (422), `err.errors` traz o detalhe por campo (`{ field,
 - `list(params)` · `create(input)` · `get(id)` · `update(id, input)` · `delete(id)`.
 
 > Referência de máquina completa: [`openapi.yaml`](https://smspulse.apidog.io/) — importável no Apidog/Postman.
-
-## Ambiente local
-
-```ts
-const smsgo = new SMSGo({
-  apiKey: process.env.SMSGO_KEY!,
-  baseUrl: 'http://localhost:3333',
-})
-```
 
 ## Exemplos
 
