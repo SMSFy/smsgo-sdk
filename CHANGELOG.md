@@ -4,6 +4,24 @@ Todas as mudanças relevantes deste pacote são documentadas aqui.
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
+## [0.3.0] - 2026-07-01
+
+### Adicionado
+
+- **`verifyWebhookSignature(rawBody, signatureHeader, secret)`** — helper para validar a
+  assinatura `X-SMSGo-Signature` dos webhooks de saída. Recalcula o HMAC-SHA256 do **corpo
+  bruto** e compara em **tempo constante** (`crypto.timingSafeEqual`); retorna `false` (sem
+  lançar) para assinatura ausente/malformada/incorreta. Antes o README pedia para o cliente
+  implementar o HMAC na mão — agora é uma linha. Continua zero-dependência (usa `node:crypto`).
+- `examples/receive-dlr-webhook.mjs` passou a **verificar a assinatura** antes de processar o
+  callback (lê `SMSGO_WEBHOOK_SECRET`, acumula o corpo bruto e rejeita com `401` se inválida).
+
+### Compatibilidade
+
+- 100% retrocompatível — apenas adiciona uma exportação nova. Parte do release unificado
+  **0.3.0** dos SDKs oficiais (Node, Python, Go, PHP) com a mesma superfície e o mesmo helper
+  de verificação de webhook.
+
 ## [0.2.1] - 2026-07-01
 
 ### Corrigido

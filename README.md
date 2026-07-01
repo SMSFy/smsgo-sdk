@@ -131,7 +131,17 @@ await smsgo.setWebhook({ rotateSecret: true }) // gira o segredo
 await smsgo.setWebhook({ url: '' }) // desativa
 ```
 
-Cada requisição traz `X-SMSGo-Signature: sha256=<hmac>` — o HMAC-SHA256 do **corpo bruto** com o seu `secret`. Valide sempre (veja [`examples/receive-dlr-webhook.mjs`](./examples/receive-dlr-webhook.mjs)).
+Cada requisição traz `X-SMSGo-Signature: sha256=<hmac>` — o HMAC-SHA256 do **corpo bruto** com o seu `secret`. Valide sempre com o helper `verifyWebhookSignature` (comparação em tempo constante):
+
+```ts
+import { verifyWebhookSignature } from '@orynlabs/smsgo'
+
+// `rawBody` deve ser o corpo BRUTO (Buffer/string), antes de qualquer parse.
+const ok = verifyWebhookSignature(rawBody, req.headers['x-smsgo-signature'], secret)
+if (!ok) return res.writeHead(401).end() // assinatura inválida
+```
+
+Veja o exemplo completo em [`examples/receive-dlr-webhook.mjs`](./examples/receive-dlr-webhook.mjs).
 
 ## Contatos e listas
 

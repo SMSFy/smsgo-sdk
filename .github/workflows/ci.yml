@@ -17,5 +17,8 @@ jobs:
       - run: npm run build
       - name: smoke test (CJS + ESM)
         run: |
-          node -e "const {SMSGo}=require('./dist/index.cjs'); if(typeof new SMSGo({apiKey:'x'}).send!=='function') process.exit(1); console.log('CJS ok')"
-          node --input-type=module -e "import {SMSGo} from './dist/index.js'; if(typeof new SMSGo({apiKey:'x'}).sendBulk!=='function') process.exit(1); console.log('ESM ok')"
+          node -e "const {SMSGo,verifyWebhookSignature}=require('./dist/index.cjs'); if(typeof new SMSGo({apiKey:'x'}).send!=='function') process.exit(1); if(typeof verifyWebhookSignature!=='function') process.exit(1); console.log('CJS ok')"
+          node --input-type=module -e "import {SMSGo,verifyWebhookSignature} from './dist/index.js'; if(typeof new SMSGo({apiKey:'x'}).sendBulk!=='function') process.exit(1); if(typeof verifyWebhookSignature!=='function') process.exit(1); console.log('ESM ok')"
+      - name: webhook signature golden vector
+        run: |
+          node --input-type=module -e "import {verifyWebhookSignature} from './dist/index.js'; const s='whsec_3f8a9c2e1b6d4a70f5e2c9b8a1d7e0f4'; const b='{\"event\":\"sms.status\",\"data\":{\"sendId\":\"7c3e1a90-2b4d-4f6a-8c1e-9d0f2a3b4c5d\",\"phone\":\"5511999990000\",\"status\":\"delivered\"}}'; const sig='sha256=986eb0c41355b1c94165c4cb275ce2cc9b175e5f93efe7e2ed4294ba58d330c3'; if(!verifyWebhookSignature(b,sig,s)) process.exit(1); if(verifyWebhookSignature(b+' ',sig,s)) process.exit(1); if(verifyWebhookSignature(b,null,s)) process.exit(1); console.log('golden ok')"

@@ -19,6 +19,8 @@
  * const sandbox = new SMSGo({ apiKey: process.env.SMSGO_TEST_KEY! })
  */
 
+import { createHmac, timingSafeEqual } from 'node:crypto'
+
 export interface SMSGoOptions {
   /** Chave permanente da conta (painel → Minha conta → API). Aceita `test_…` (sandbox). */
   apiKey: string
@@ -780,6 +782,39 @@ function httpCodeName(status: number): string {
     default:
       return `http_${status}`
   }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Webhooks — verificação de assinatura                                       */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Verifica a assinatura `X-SMSGo-Signature` de um webhook de saída.
+ *
+ * Recalcula o HMAC-SHA256 do **corpo bruto** (exatamente os bytes recebidos, antes
+ * de qualquer parse/reserialização) com o seu `secret` e compara, em tempo constante,
+ * com o header. Retorna `false` (sem lançar) quando a assinatura está ausente,
+ * malformada ou não confere.
+ *
+ * @param rawBody          Corpo bruto da requisição (string ou Buffer/Uint8Array).
+ * @param signatureHeader  Valor do header `X-SMSGo-Signature` (formato `sha256=<hex>`).
+ * @param secret           Segredo do webhook (`whsec_…`), de `getWebhook()`/`setWebhook()`.
+ *
+ * @example
+ * import { verifyWebhookSignature } from '@orynlabs/smsgo'
+ * const ok = verifyWebhookSignature(rawBody, req.headers['x-smsgo-signature'], secret)
+ * if (!ok) { res.writeHead(401).end(); return }
+ */
+export function verifyWebhookSignature(
+  rawBody: string | Uint8Array,
+  signatureHeader: string | null | undefined,
+  secret: string
+): boolean {
+  if (!signatureHeader || !secret) return false
+  const expected = 'sha256=' + createHmac('sha256', secret).update(rawBody).digest('hex')
+  const a = Buffer.from(signatureHeader)
+  const b = Buffer.from(expected)
+  return a.length === b.length && timingSafeEqual(a, b)
 }
 
 export default SMSGo
