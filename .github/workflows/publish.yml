@@ -23,12 +23,27 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm install
       - run: npm run build
+      # Se a versão do package.json já está no npm (ex.: Release retroativo ou
+      # re-run), pula o publish e encerra verde — o npm é imutável por versão.
+      - name: Versão já publicada?
+        id: check
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if npm view "@orynlabs/smsgo@$VERSION" version >/dev/null 2>&1; then
+            echo "already=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::@orynlabs/smsgo@$VERSION já está no npm — pulando publish."
+          else
+            echo "already=false" >> "$GITHUB_OUTPUT"
+          fi
       # Valida o NPM_TOKEN sem publicar: imprime o usuário npm se o token
       # autenticar; falha aqui (e aborta o publish) se estiver errado/ausente.
       - name: Validar NPM_TOKEN (whoami)
+        if: steps.check.outputs.already == 'false'
         run: npm whoami
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - run: npm publish --provenance --access public
+      - name: Publicar no npm
+        if: steps.check.outputs.already == 'false'
+        run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
